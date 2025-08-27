@@ -1,0 +1,12 @@
+package models
+
+import "time"
+
+type User struct {
+	ID        string `gorm:"primaryKey"`
+	Username  string `gorm:"not null"`
+	Password  string `gorm:"not null"`
+	IsAdmin   bool   `gorm:"not null"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}

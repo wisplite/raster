@@ -20,6 +20,8 @@ func Init() bool {
 	// Run migrations
 	err = database.AutoMigrate(
 		&models.Album{},
+		&models.User{},
+		&models.AccessToken{},
 	)
 	if err != nil {
 		log.Fatal("failed to migrate database: ", err)
