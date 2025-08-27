@@ -18,6 +18,7 @@ func CreateUser(username string, password string) error {
 		Username: username,
 		Password: string(hashedPassword),
 		IsAdmin:  false,
+		IsActive: false,
 	}
 	result := db.GetDB().Create(&user)
 	if result.Error != nil {
