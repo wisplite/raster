@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ChevronDown, LogIn, LogOut, UserIcon } from 'lucide-react'
+import { ChevronDown, LogIn, LogOut, UserIcon, Settings } from 'lucide-react'
 import * as Popover from '@radix-ui/react-popover'
 import { useState } from 'react';
 import { useAccount } from '../contexts/useAccount';
@@ -24,21 +24,39 @@ export default function NavBar({ path }) {
                         <UserIcon className="w-6 h-6 text-white cursor-pointer" />
                         <ChevronDown className={`w-4 h-4 text-white ${open ? 'rotate-180' : ''}`} />
                     </Popover.Trigger>
-                    <Popover.Content align="end" sideOffset={8}>
-                        <div className="flex flex-col items-center justify-start gap-2 bg-[#141414] border px-4 py-2 border-[#2B2B2B] rounded-md p-2  ">
-                            <p className="text-white red-hat-text">Logged in as: {user?.Username || 'Guest'}</p>
-                            <hr className="w-full border-[#2B2B2B]" />
-                            {user ? (
-                                <div className="flex flex-row items-center justify-start gap-2">
-                                    <p className="text-white cursor-pointer red-hat-text" onClick={logout}>Log Out</p>
-                                    <LogOut className="w-4 h-4 text-white cursor-pointer" onClick={logout} />
-                                </div>
-                            ) : (
-                                <div className="flex flex-row items-center justify-start gap-2">
-                                    <Link to="/login" className="text-white red-hat-text">Log In</Link>
-                                    <LogIn className="w-4 h-4 text-white cursor-pointer" />
-                                </div>
-                            )}
+                    <Popover.Content align="end" sideOffset={8} className="w-56 z-50">
+                        <div className="flex flex-col bg-[#141414] border border-[#2B2B2B] rounded-lg shadow-xl overflow-hidden">
+                            <div className="px-4 py-3 border-b border-[#2B2B2B] bg-[#1A1A1A]">
+                                <p className="text-xs text-gray-400 mb-0.5 font-medium red-hat-mono">Signed in as</p>
+                                <p className="text-sm text-white font-bold truncate red-hat-text">{user?.Username || 'Guest'}</p>
+                            </div>
+
+                            <div className="p-1.5 flex flex-col gap-0.5">
+                                {user ? (
+                                    <>
+                                        <button className="flex items-center gap-3 px-3 py-2 w-full text-left text-sm text-gray-300 hover:text-white hover:bg-[#2B2B2B] rounded-md transition-all group cursor-pointer">
+                                            <Settings className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                                            <span className="font-medium red-hat-text">Settings</span>
+                                        </button>
+
+                                        <button
+                                            onClick={logout}
+                                            className="flex items-center gap-3 px-3 py-2 w-full text-left text-sm text-gray-300 hover:text-white hover:bg-[#2B2B2B] rounded-md transition-all group cursor-pointer"
+                                        >
+                                            <LogOut className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                                            <span className="font-medium red-hat-text">Log Out</span>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <Link
+                                        to="/login"
+                                        className="flex items-center gap-3 px-3 py-2 w-full text-left text-sm text-gray-300 hover:text-white hover:bg-[#2B2B2B] rounded-md transition-all group cursor-pointer"
+                                    >
+                                        <LogIn className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                                        <span className="font-medium red-hat-text">Log In</span>
+                                    </Link>
+                                )}
+                            </div>
                         </div>
                     </Popover.Content>
                 </Popover.Root>
