@@ -14,6 +14,7 @@ type Album struct {
 	Private     bool           `gorm:"not null"`
 	// Public albums have a default access level of 0 for all visitors, including guests.
 	// Private albums require a user with access to be logged in to view, or a magic link to be used.
+	ParentID  string `gorm:"not null"` // The ID of the parent album, if any. This is an empty string for root albums.
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
