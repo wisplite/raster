@@ -22,7 +22,7 @@ export default function Login() {
             <div className="flex flex-col w-full max-w-md px-8">
                 <div className="flex flex-col gap-8 border border-[#2B2B2B] rounded-lg p-8 bg-[#1a1a1a]">
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-3xl font-bold text-white red-hat-mono">Login</h1>
+                        <h1 className="text-3xl font-bold text-white red-hat-mono">Sign In</h1>
                         <p className="text-sm text-gray-400 red-hat-text">Enter your credentials to continue</p>
                     </div>
 
@@ -51,7 +51,7 @@ export default function Login() {
                     </div>
 
                     <button className="w-full py-2.5 bg-white text-black rounded-md font-medium hover:bg-gray-200 transition-colors red-hat-mono cursor-pointer" onClick={handleLogin}>
-                        Login
+                        Sign In
                     </button>
                 </div>
             </div>

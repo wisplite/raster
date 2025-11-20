@@ -14,15 +14,16 @@ export default function NavBar({ path }) {
                         <Link to={`/${path.slice(0, index + 1).join('/')}`} key={item} className={`text-white ${index === path.length - 1 ? 'font-bold' : ''}`}>
                             {item}
                         </Link>
-                        {index !== path.length - 1 && <p className="text-white">/</p>}
+                        {index !== path.length - 1 && <p className="text-white red-hat-mono">/</p>}
                     </div>
                 ))}
             </div>
+
             <div className="flex flex-row items-center justify-start gap-2">
                 <Popover.Root open={open} onOpenChange={setOpen}>
                     <Popover.Trigger className="flex flex-row items-center justify-start gap-0 cursor-pointer">
                         <UserIcon className="w-6 h-6 text-white cursor-pointer" />
-                        <ChevronDown className={`w-4 h-4 text-white ${open ? 'rotate-180' : ''}`} />
+                        {/* <ChevronDown className={`w-4 h-4 text-white ${open ? 'rotate-180' : ''}`} /> */}
                     </Popover.Trigger>
                     <Popover.Content align="end" sideOffset={8} className="w-56 z-50">
                         <div className="flex flex-col bg-[#141414] border border-[#2B2B2B] rounded-lg shadow-xl overflow-hidden">
@@ -44,7 +45,7 @@ export default function NavBar({ path }) {
                                             className="flex items-center gap-3 px-3 py-2 w-full text-left text-sm text-gray-300 hover:text-white hover:bg-[#2B2B2B] rounded-md transition-all group cursor-pointer"
                                         >
                                             <LogOut className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
-                                            <span className="font-medium red-hat-text">Log Out</span>
+                                            <span className="font-medium red-hat-text">Sign Out</span>
                                         </button>
                                     </>
                                 ) : (
@@ -53,7 +54,7 @@ export default function NavBar({ path }) {
                                         className="flex items-center gap-3 px-3 py-2 w-full text-left text-sm text-gray-300 hover:text-white hover:bg-[#2B2B2B] rounded-md transition-all group cursor-pointer"
                                     >
                                         <LogIn className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
-                                        <span className="font-medium red-hat-text">Log In</span>
+                                        <span className="font-medium red-hat-text">Sign In</span>
                                     </Link>
                                 )}
                             </div>
