@@ -40,6 +40,10 @@ func RegisterAlbumRoutes(rg *gin.RouterGroup) {
 			Description string `json:"description"`
 			ParentID    string `json:"parentId"`
 		}
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 		result, err := services.CreateAlbum(accessToken, request.Title, request.Description, request.ParentID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

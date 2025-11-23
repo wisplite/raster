@@ -62,11 +62,11 @@ func RegisterUserRoutes(rg *gin.RouterGroup) {
 	})
 	user.GET("/getUserData", func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
-		token := authHeader
-		if len(authHeader) > 7 && authHeader[:7] == "Bearer " {
-			token = authHeader[7:]
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
 		}
-		userData, err := services.GetUserData(token)
+		userData, err := services.GetUserData(authHeader)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return

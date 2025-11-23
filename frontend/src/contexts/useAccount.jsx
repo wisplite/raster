@@ -36,7 +36,7 @@ export const AccountProvider = ({ children }) => {
         }
         const response = await fetch(`${getServerUrl()}/api/user/getUserData`, {
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
+                'Authorization': accessToken,
             },
         })
         const data = await response.json()

@@ -82,7 +82,7 @@ func CreateAlbum(accessToken string, title string, description string, parentID 
 }
 
 func CheckUserAlbumAccess(userID string, albumID string) (int, error) {
-	userAccess := models.UserAccess{}
+	userAccess := models.UserAlbumAccess{}
 	result := db.GetDB().First(&userAccess, "user_id = ? AND album_id = ?", userID, albumID)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {

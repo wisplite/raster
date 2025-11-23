@@ -19,7 +19,7 @@ type Album struct {
 	UpdatedAt time.Time
 }
 
-type UserAccess struct {
+type UserAlbumAccess struct {
 	UserID      string `gorm:"not null"`
 	AlbumID     string `gorm:"not null"`
 	AccessLevel int    `gorm:"not null"` // 0: View, 1: Upload, 2: Edit, 3: Edit/Delete, 4: Admin (manage other users)
