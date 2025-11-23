@@ -38,9 +38,9 @@ func GetAlbumsInParent(parentID string, authToken string) ([]models.Album, error
 		if album.Private {
 			accessLevel, err := CheckUserAlbumAccess(userID, album.ID)
 			if err != nil {
-				return []models.Album{}, err
+				continue // if user is not found, assume user is guest
 			}
-			if accessLevel < 1 {
+			if accessLevel < 0 {
 				continue
 			}
 		}
@@ -138,4 +138,16 @@ func GetIDFromPath(path string) (string, error) {
 	}
 
 	return currentParentID, nil
+}
+
+func IsAlbumPublic(albumID string) (bool, error) {
+	if albumID == "" {
+		return true, nil
+	}
+	album := models.Album{}
+	result := db.GetDB().First(&album, "id = ?", albumID)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	return !album.Private, nil
 }

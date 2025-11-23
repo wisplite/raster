@@ -7,7 +7,7 @@ export default function NavBar({ path }) {
     const [open, setOpen] = useState(false);
     const { user, logout } = useAccount();
     return (
-        <div className="flex flex-row items-center justify-between h-1/10 w-full px-6 py-2 border-b border-[#2B2B2B]">
+        <div className="flex flex-row items-center justify-between h-[10vh] w-full px-6 py-2 border-b border-[#2B2B2B] shrink-0">
             <div className="flex flex-row items-center justify-start gap-2">
                 {path.map((item, index) => (
                     <div className="flex flex-row items-center justify-start gap-2 red-hat-mono">

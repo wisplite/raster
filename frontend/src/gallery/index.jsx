@@ -51,7 +51,7 @@ export default function Gallery() {
     }, [currentAlbumID])
 
     return (
-        <div className="flex flex-col items-center justify-start h-full w-full bg-[#141414]">
+        <div className="flex flex-col items-center justify-start min-h-screen w-full bg-[#141414]">
             <NavBar path={pathList} />
             <AlbumList currentAlbumName={currentAlbumID} />
             <MediaList albumId={currentAlbumID} albumName={currentAlbumName} />

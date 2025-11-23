@@ -39,18 +39,47 @@ func RegisterMediaRoutes(rg *gin.RouterGroup) {
 	media.GET("/getAllMediaInAlbum", func(c *gin.Context) {
 		accessToken := c.GetHeader("Authorization")
 		albumID := c.Query("albumId")
-		media, err := services.GetAllMediaInAlbum(albumID, accessToken)
+		isPublic, err := services.IsAlbumPublic(albumID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"media": media})
+		if isPublic {
+			media, err := services.GetAllMediaInPublicAlbum(albumID)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"media": media})
+			return
+		} else {
+			media, err := services.GetAllMediaInAlbum(albumID, accessToken)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"media": media})
+		}
 	})
 	media.GET("/:albumId/:mediaId", func(c *gin.Context) {
 		albumID := c.Param("albumId")
 		mediaID := c.Param("mediaId")
 		if albumID == "root" {
 			albumID = ""
+		}
+		isPublic, err := services.IsAlbumPublic(albumID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		if isPublic {
+			mediaData, err := services.GetMedia(albumID, mediaID)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			c.File(mediaData.Path)
+			return
 		}
 		accessToken := c.GetHeader("Authorization")
 		userID, err := services.ValidateAccessToken(accessToken)

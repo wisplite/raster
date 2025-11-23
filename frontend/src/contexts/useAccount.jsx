@@ -59,8 +59,11 @@ export const AccountProvider = ({ children }) => {
         if (!accessToken && localStorage.getItem('accessToken')) {
             setAccessToken(localStorage.getItem('accessToken'))
             return localStorage.getItem('accessToken')
+        } else if (accessToken) {
+            return accessToken
+        } else {
+            return "guest"
         }
-        return accessToken
     }
 
     return <AccountContext.Provider value={{ getAccessToken, logout, login, fetchUserData, user }}>{children}</AccountContext.Provider>

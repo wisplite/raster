@@ -83,6 +83,15 @@ func GetAllMediaInAlbum(albumID string, accessToken string) ([]models.Media, err
 	return media, nil
 }
 
+func GetAllMediaInPublicAlbum(albumID string) ([]models.Media, error) {
+	media := []models.Media{}
+	result := db.GetDB().Where("album_id = ?", albumID).Find(&media)
+	if result.Error != nil {
+		return []models.Media{}, result.Error
+	}
+	return media, nil
+}
+
 func GetMedia(albumID string, mediaID string) (models.Media, error) {
 	media := models.Media{}
 	result := db.GetDB().First(&media, "album_id = ? AND id = ?", albumID, mediaID)
