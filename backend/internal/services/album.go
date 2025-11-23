@@ -2,6 +2,8 @@ package services
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/wisplite/raster/internal/db"
@@ -67,19 +69,31 @@ func CreateAlbum(accessToken string, title string, description string, parentID 
 	if accessLevel < 2 {
 		return models.Album{}, fmt.Errorf("user does not have permission to create albums in this parent")
 	}
+	if !regexp.MustCompile(`^[a-zA-Z0-9\s\-_]+$`).MatchString(title) {
+		return models.Album{}, fmt.Errorf("title can only contain alphanumeric characters, spaces, and hyphens/underscores")
+	}
+	// check for duplicate title in parent
+	existingAlbum := models.Album{}
+	result := db.GetDB().First(&existingAlbum, "title = ? AND parent_id = ?", title, parentID)
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
+		return models.Album{}, result.Error
+	}
+	if existingAlbum.ID != "" {
+		return models.Album{}, fmt.Errorf("album with this title already exists in this parent")
+	}
 	albumID := uuid.New().String()
-	album := models.Album{
+	newAlbum := models.Album{
 		ID:          albumID,
 		Title:       title,
 		Description: description,
 		ParentID:    parentID,
 		Thumbnail:   "",
 	}
-	result := db.GetDB().Create(&album)
-	if result.Error != nil {
+	newAlbumResult := db.GetDB().Create(&newAlbum)
+	if newAlbumResult.Error != nil {
 		return models.Album{}, result.Error
 	}
-	return album, nil
+	return newAlbum, nil
 }
 
 func CheckUserAlbumAccess(userID string, albumID string) (int, error) {
@@ -99,4 +113,24 @@ func CheckUserAlbumAccess(userID string, albumID string) (int, error) {
 		return -1, result.Error
 	}
 	return userAccess.AccessLevel, nil
+}
+
+func GetIDFromPath(path string) (string, error) {
+	currentParentID := ""
+	segments := strings.Split(path, "/")
+
+	for _, segment := range segments {
+		if segment == "" {
+			continue
+		}
+
+		var album models.Album
+		result := db.GetDB().Where("title = ? AND parent_id = ?", segment, currentParentID).First(&album)
+		if result.Error != nil {
+			return "", result.Error
+		}
+		currentParentID = album.ID
+	}
+
+	return currentParentID, nil
 }

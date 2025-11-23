@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { getServerUrl } from '../hooks/getConstants'
 import { useNavigate } from 'react-router-dom'
+import { useNotifier } from '../contexts/useNotifier'
 
 export default function CreateRootUser() {
     const navigate = useNavigate()
+    const { showError, showSuccess } = useNotifier()
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const handleCreateRootUser = async () => {
@@ -19,7 +21,7 @@ export default function CreateRootUser() {
         })
         const data = await response.json()
         if (data.error) {
-            console.error(data.error)
+            showError(data.error)
         } else {
             const rootResponse = await fetch(`${getServerUrl()}/api/user/setRootUser`, {
                 method: 'POST',
@@ -32,9 +34,10 @@ export default function CreateRootUser() {
             })
             const rootData = await rootResponse.json()
             if (rootData.error) {
-                console.error(rootData.error)
+                showError(rootData.error)
             } else {
                 navigate('/gallery')
+                showSuccess('Root user created successfully')
             }
         }
     }

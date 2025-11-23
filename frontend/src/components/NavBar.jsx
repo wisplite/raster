@@ -12,7 +12,7 @@ export default function NavBar({ path }) {
                 {path.map((item, index) => (
                     <div className="flex flex-row items-center justify-start gap-2 red-hat-mono">
                         <Link to={`/${path.slice(0, index + 1).join('/')}`} key={item} className={`text-white ${index === path.length - 1 ? 'font-bold' : ''}`}>
-                            {item}
+                            {decodeURIComponent(item)}
                         </Link>
                         {index !== path.length - 1 && <p className="text-white red-hat-mono">/</p>}
                     </div>

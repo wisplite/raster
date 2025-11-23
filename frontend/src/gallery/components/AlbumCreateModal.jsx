@@ -2,10 +2,12 @@ import Modal from '../../components/Modal'
 import { getServerUrl } from '../../hooks/getConstants'
 import { useAccount } from '../../contexts/useAccount'
 import { useState } from 'react'
+import { useNotifier } from '../../contexts/useNotifier'
 export default function AlbumCreateModal({ open, onOpenChange, trigger, parentId }) {
     const { getAccessToken } = useAccount()
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
+    const { showError } = useNotifier()
     const handleCreateAlbum = async () => {
         const response = await fetch(`${getServerUrl()}/api/albums/createAlbum`, {
             method: 'POST',
@@ -21,7 +23,7 @@ export default function AlbumCreateModal({ open, onOpenChange, trigger, parentId
         })
         const data = await response.json()
         if (data.error) {
-            console.error(data.error)
+            showError(data.error)
         } else {
             onOpenChange(false)
         }

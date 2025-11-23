@@ -51,4 +51,19 @@ func RegisterAlbumRoutes(rg *gin.RouterGroup) {
 		}
 		c.JSON(http.StatusOK, result)
 	})
+	album.POST("/getIDFromPath", func(c *gin.Context) {
+		var request struct {
+			Path string `json:"path"`
+		}
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		id, err := services.GetIDFromPath(request.Path)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Album not found"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"id": id})
+	})
 }

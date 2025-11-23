@@ -4,7 +4,7 @@ import "time"
 
 type User struct {
 	ID        string `gorm:"primaryKey"`
-	Username  string `gorm:"not null"`
+	Username  string `gorm:"not null unique"`
 	Password  string `gorm:"not null"`
 	IsAdmin   bool   `gorm:"not null"`
 	IsRoot    bool   `gorm:"not null"`
