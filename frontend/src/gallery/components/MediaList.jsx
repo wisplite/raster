@@ -1,5 +1,6 @@
 import { Upload } from 'lucide-react'
 import MediaUploadModal from './MediaUploadModal'
+import AuthImage from '../../components/AuthImage'
 import { useState, useEffect } from 'react'
 import { getServerUrl } from '../../hooks/getConstants'
 import { useAccount } from '../../contexts/useAccount'
@@ -14,12 +15,23 @@ export default function MediaList({ albumId, albumName }) {
     useEffect(() => {
         let ignore = false;
         const getMedia = async () => {
-            if (!albumId) return
-
             // TODO: Implement media fetching from API
             // const response = await fetch(...)
+            const response = await fetch(`${getServerUrl()}/api/media/getAllMediaInAlbum?albumId=${albumId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': getAccessToken(),
+                },
+            })
+            const data = await response.json()
+            if (ignore) return
+            if (data.error) {
+                showError(data.error)
+            } else {
+                console.log("data.media", data.media)
+                setMedia(data.media)
+            }
         }
-
         getMedia()
         return () => { ignore = true; }
     }, [albumId])
@@ -31,12 +43,21 @@ export default function MediaList({ albumId, albumName }) {
                 <Upload className="w-6 h-6 cursor-pointer" color="white" onClick={() => setOpen(true)} />
             </div>
 
-            {/* Media Grid Placeholder */}
+            {/* Media Grid */}
             <div className="flex flex-row items-center justify-start gap-2 w-full px-6 flex-wrap">
                 {media.length === 0 && (
                     <p className="text-gray-500 red-hat-text">No media in this album</p>
                 )}
-                {/* Render media items here */}
+                {media.map((media) => (
+                    <div key={media.id} className="flex flex-col items-center justify-center w-24 h-24 bg-[#1A1A1A] rounded-md border border-[#2B2B2B]">
+                        <AuthImage
+                            src={`${getServerUrl()}/api/media/${albumId ? albumId : 'root'}/${media.ID}`}
+                            token={getAccessToken()}
+                            alt={media.Title}
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                ))}
             </div>
 
             <MediaUploadModal

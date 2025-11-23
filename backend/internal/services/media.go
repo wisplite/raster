@@ -38,3 +38,32 @@ func UploadMedia(file *multipart.FileHeader, albumID string, accessToken string)
 	}
 	return media, nil
 }
+
+func GetAllMediaInAlbum(albumID string, accessToken string) ([]models.Media, error) {
+	userID, err := ValidateAccessToken(accessToken)
+	if err != nil {
+		return []models.Media{}, err
+	}
+	accessLevel, err := CheckUserAlbumAccess(userID, albumID)
+	if err != nil {
+		return []models.Media{}, err
+	}
+	if accessLevel < 0 {
+		return []models.Media{}, fmt.Errorf("user does not have permission to view media in this album")
+	}
+	media := []models.Media{}
+	result := db.GetDB().Where("album_id = ?", albumID).Find(&media)
+	if result.Error != nil {
+		return []models.Media{}, result.Error
+	}
+	return media, nil
+}
+
+func GetMedia(albumID string, mediaID string) (models.Media, error) {
+	media := models.Media{}
+	result := db.GetDB().First(&media, "album_id = ? AND id = ?", albumID, mediaID)
+	if result.Error != nil {
+		return models.Media{}, result.Error
+	}
+	return media, nil
+}

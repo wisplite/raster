@@ -36,4 +36,42 @@ func RegisterMediaRoutes(rg *gin.RouterGroup) {
 		}
 		c.JSON(http.StatusOK, gin.H{"media": media})
 	})
+	media.GET("/getAllMediaInAlbum", func(c *gin.Context) {
+		accessToken := c.GetHeader("Authorization")
+		albumID := c.Query("albumId")
+		media, err := services.GetAllMediaInAlbum(albumID, accessToken)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"media": media})
+	})
+	media.GET("/:albumId/:mediaId", func(c *gin.Context) {
+		albumID := c.Param("albumId")
+		mediaID := c.Param("mediaId")
+		if albumID == "root" {
+			albumID = ""
+		}
+		accessToken := c.GetHeader("Authorization")
+		userID, err := services.ValidateAccessToken(accessToken)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		accessLevel, err := services.CheckUserAlbumAccess(userID, albumID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		if accessLevel < 0 {
+			c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to view media in this album"})
+			return
+		}
+		mediaData, err := services.GetMedia(albumID, mediaID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.File(mediaData.Path)
+	})
 }
