@@ -6,4 +6,5 @@ func RegisterRoutes(r *gin.Engine) {
 	rg := r.Group("/api")
 	RegisterAlbumRoutes(rg)
 	RegisterUserRoutes(rg)
+	RegisterMediaRoutes(rg)
 }

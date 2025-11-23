@@ -2,12 +2,13 @@ import Modal from '../../components/Modal'
 import { useAccount } from '../../contexts/useAccount'
 import { useState, useRef } from 'react'
 import { X, Upload, FileImage, FileVideo, Trash2 } from 'lucide-react'
-
+import { useNotifier } from '../../contexts/useNotifier'
+import { getServerUrl } from '../../hooks/getConstants'
 export default function MediaUploadModal({ open, onOpenChange, trigger, albumName, albumId }) {
     const { getAccessToken } = useAccount()
     const [files, setFiles] = useState([])
     const fileInputRef = useRef(null)
-
+    const { showError, showSuccess } = useNotifier()
     const handleFileSelect = (e) => {
         if (e.target.files) {
             const newFiles = Array.from(e.target.files).map(file => ({
@@ -38,24 +39,23 @@ export default function MediaUploadModal({ open, onOpenChange, trigger, albumNam
             // formData.append('albumId', albumId)
             // await fetch('/api/upload', { method: 'POST', body: formData, ... })
 
-            // Simulation:
-            return new Promise((resolve) => {
-                let progress = 0
-                const interval = setInterval(() => {
-                    progress += 5
-                    setFiles(prev => prev.map(f => {
-                        if (f.id === fileWrapper.id) {
-                            if (progress >= 100) {
-                                clearInterval(interval)
-                                resolve()
-                                return { ...f, progress: 100, status: 'completed' }
-                            }
-                            return { ...f, progress, status: 'uploading' }
-                        }
-                        return f
-                    }))
-                }, 100)
+            const formData = new FormData()
+            formData.append('file', fileWrapper.file)
+            formData.append('albumId', albumId)
+            const response = await fetch(`${getServerUrl()}/api/media/uploadMedia`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Authorization': getAccessToken(),
+                },
             })
+            const data = await response.json()
+            if (data.error) {
+                showError(data.error)
+            } else {
+                setFiles(prev => prev.map(f => f.id === fileWrapper.id ? { ...f, status: 'completed' } : f))
+                showSuccess('Media uploaded successfully')
+            }
         }
 
         // Start uploads
