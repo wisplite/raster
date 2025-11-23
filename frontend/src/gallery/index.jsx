@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import AlbumList from './components/AlbumList';
 import { getServerUrl } from '../hooks/getConstants';
 import { useNotifier } from '../contexts/useNotifier';
+import MediaList from './components/MediaList';
 export default function Gallery() {
     const currentPath = useLocation().pathname;
     const pathList = currentPath.split('/').slice(1);
@@ -53,6 +54,7 @@ export default function Gallery() {
         <div className="flex flex-col items-center justify-start h-full w-full bg-[#141414]">
             <NavBar path={pathList} />
             <AlbumList currentAlbumName={currentAlbumID} />
+            <MediaList albumId={currentAlbumID} albumName={currentAlbumName} />
         </div>
     )
 }
