@@ -73,6 +73,7 @@ func CreateAlbum(accessToken string, title string, description string, parentID 
 		Title:       title,
 		Description: description,
 		ParentID:    parentID,
+		Thumbnail:   "",
 	}
 	result := db.GetDB().Create(&album)
 	if result.Error != nil {

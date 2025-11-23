@@ -9,7 +9,7 @@ import (
 
 func RegisterAlbumRoutes(rg *gin.RouterGroup) {
 	album := rg.Group("/albums")
-	album.GET("/getAlbumsInParent", func(c *gin.Context) {
+	album.POST("/getAlbumsInParent", func(c *gin.Context) {
 		accessToken := c.GetHeader("Authorization")
 		if accessToken == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})

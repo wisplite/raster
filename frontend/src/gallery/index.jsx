@@ -6,6 +6,7 @@ import AlbumList from './components/AlbumList';
 export default function Gallery() {
     const currentPath = useLocation().pathname;
     const pathList = currentPath.split('/').slice(1);
+    const currentAlbumName = pathList[pathList.length - 1];
     const { fetchUserData, user } = useAccount()
 
     useEffect(() => {
@@ -15,7 +16,7 @@ export default function Gallery() {
     return (
         <div className="flex flex-col items-center justify-start h-full w-full bg-[#141414]">
             <NavBar path={pathList} />
-            <AlbumList />
+            <AlbumList currentAlbumName={currentAlbumName} />
         </div>
     )
 }
