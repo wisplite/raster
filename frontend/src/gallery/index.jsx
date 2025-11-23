@@ -9,7 +9,7 @@ export default function Gallery() {
     const currentPath = useLocation().pathname;
     const pathList = currentPath.split('/').slice(1);
     const currentAlbumName = pathList[pathList.length - 1];
-    const [currentAlbumID, setCurrentAlbumID] = useState("!notfound!"); // set to impossible value to prevent client from fetching root album
+    const [currentAlbumID, setCurrentAlbumID] = useState(null); // Initialize as null to prevent premature fetching
     const { fetchUserData, user } = useAccount()
     const { getAccessToken } = useAccount()
     const { showError } = useNotifier()

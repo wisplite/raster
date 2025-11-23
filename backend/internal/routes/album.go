@@ -11,10 +11,6 @@ func RegisterAlbumRoutes(rg *gin.RouterGroup) {
 	album := rg.Group("/albums")
 	album.POST("/getAlbumsInParent", func(c *gin.Context) {
 		accessToken := c.GetHeader("Authorization")
-		if accessToken == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-			return
-		}
 		var request struct {
 			ParentID string `json:"parentId"`
 		}

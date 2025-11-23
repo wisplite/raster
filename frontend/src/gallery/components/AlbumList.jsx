@@ -11,48 +11,42 @@ export default function AlbumList({ currentAlbumName }) {
     const [albums, setAlbums] = useState([])
     const navigate = useNavigate()
     const { showError } = useNotifier()
-    const getAlbums = async () => {
-        console.log('Getting albums in parent', currentAlbumName)
-        if (currentAlbumName === 'gallery') { // Root album
-            const response = await fetch(`${getServerUrl()}/api/albums/getAlbumsInParent`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': getAccessToken(),
-                },
-                body: JSON.stringify({
-                    parentId: "",
-                }),
-            })
-            const data = await response.json()
-            if (data.error) {
-                setAlbums([])
-                showError('Failed to get albums')
-            } else {
-                setAlbums(data)
-            }
-        } else {
-            const response = await fetch(`${getServerUrl()}/api/albums/getAlbumsInParent`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': getAccessToken(),
-                },
-                body: JSON.stringify({
-                    parentId: currentAlbumName,
-                }),
-            })
-            const data = await response.json()
-            if (data.error) {
-                setAlbums([])
-                showError('Failed to get albums')
-            } else {
-                setAlbums(data)
+    useEffect(() => {
+        let ignore = false;
+        const getAlbums = async () => {
+            console.log('Getting albums in parent', currentAlbumName)
+            const parentId = currentAlbumName === 'gallery' ? "" : currentAlbumName;
+            try {
+                const response = await fetch(`${getServerUrl()}/api/albums/getAlbumsInParent`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': getAccessToken(),
+                    },
+                    body: JSON.stringify({
+                        parentId: parentId,
+                    }),
+                })
+                const data = await response.json()
+                if (!ignore) {
+                    if (data.error) {
+                        setAlbums([])
+                        showError('Failed to get albums')
+                    } else {
+                        setAlbums(data)
+                    }
+                }
+            } catch (error) {
+                if (!ignore) {
+                    setAlbums([])
+                    showError('Failed to get albums')
+                }
             }
         }
-    }
-    useEffect(() => {
-        if (!open) {
+
+        if (!open && currentAlbumName !== null) {
             getAlbums()
         }
+        return () => { ignore = true; }
     }, [currentAlbumName, open])
     return (
         <div className="flex flex-col items-center justify-start h-full w-full bg-[#141414]">

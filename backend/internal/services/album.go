@@ -14,17 +14,22 @@ import (
 func GetAlbumsInParent(parentID string, authToken string) ([]models.Album, error) {
 	userID, err := ValidateAccessToken(authToken)
 	if err != nil {
-		return []models.Album{}, err
+		if err != gorm.ErrRecordNotFound { //if record not found, assume user is guest
+			return []models.Album{}, err
+		}
 	}
 	accessLevel, err := CheckUserAlbumAccess(userID, parentID)
 	if err != nil {
-		return []models.Album{}, err
+		if err != gorm.ErrRecordNotFound { //if record not found, assume user is guest
+			return []models.Album{}, err
+		}
+		accessLevel = 1
 	}
-	if accessLevel < 1 {
+	if accessLevel < 0 {
 		return []models.Album{}, fmt.Errorf("user does not have permission to view albums in this parent")
 	}
 	albums := []models.Album{}
-	result := db.GetDB().Where("private = ?", false).Where("parent_id = ?", parentID).Find(&albums)
+	result := db.GetDB().Where("parent_id = ?", parentID).Find(&albums)
 	if result.Error != nil {
 		return []models.Album{}, result.Error
 	}
