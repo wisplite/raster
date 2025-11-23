@@ -17,4 +17,22 @@ func RegisterAlbumRoutes(rg *gin.RouterGroup) {
 		}
 		c.JSON(http.StatusOK, albums)
 	})
+	album.POST("/createAlbum", func(c *gin.Context) {
+		accessToken := c.GetHeader("Authorization")
+		if accessToken == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+		var request struct {
+			Title       string `json:"title"`
+			Description string `json:"description"`
+			ParentID    string `json:"parentId"`
+		}
+		result, err := services.CreateAlbum(accessToken, request.Title, request.Description, request.ParentID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, result)
+	})
 }

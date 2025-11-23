@@ -97,3 +97,12 @@ func GetUserData(authToken string) (models.User, error) {
 	}
 	return userData, nil
 }
+
+func GetUserByID(userID string) (models.User, error) {
+	user := models.User{}
+	result := db.GetDB().First(&user, "id = ?", userID)
+	if result.Error != nil {
+		return models.User{}, result.Error
+	}
+	return user, nil
+}

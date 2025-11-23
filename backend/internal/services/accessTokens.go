@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,4 +22,16 @@ func CreateAccessToken(userID string) (models.AccessToken, error) {
 		return models.AccessToken{}, result.Error
 	}
 	return accessToken, nil
+}
+
+func ValidateAccessToken(accessToken string) (string, error) {
+	accessTokenModel := models.AccessToken{}
+	result := db.GetDB().First(&accessTokenModel, "token = ?", accessToken)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	if accessTokenModel.Expires.Before(time.Now()) {
+		return "", fmt.Errorf("access token expired")
+	}
+	return accessTokenModel.UserID, nil
 }
