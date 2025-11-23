@@ -9,13 +9,37 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetPublicAlbums() ([]models.Album, error) {
+func GetAlbumsInParent(parentID string, authToken string) ([]models.Album, error) {
+	userID, err := ValidateAccessToken(authToken)
+	if err != nil {
+		return []models.Album{}, err
+	}
+	accessLevel, err := CheckUserAlbumAccess(userID, parentID)
+	if err != nil {
+		return []models.Album{}, err
+	}
+	if accessLevel < 1 {
+		return []models.Album{}, fmt.Errorf("user does not have permission to view albums in this parent")
+	}
 	albums := []models.Album{}
-	result := db.GetDB().Where("private = ?", false).Find(&albums)
+	result := db.GetDB().Where("private = ?", false).Where("parent_id = ?", parentID).Find(&albums)
 	if result.Error != nil {
 		return []models.Album{}, result.Error
 	}
-	return albums, nil
+	filteredAlbums := []models.Album{}
+	for _, album := range albums {
+		if album.Private {
+			accessLevel, err := CheckUserAlbumAccess(userID, album.ID)
+			if err != nil {
+				return []models.Album{}, err
+			}
+			if accessLevel < 1 {
+				continue
+			}
+		}
+		filteredAlbums = append(filteredAlbums, album)
+	}
+	return filteredAlbums, nil
 }
 
 func GetAlbum(id string, authToken string) (models.Album, error) {

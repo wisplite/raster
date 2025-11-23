@@ -9,8 +9,20 @@ import (
 
 func RegisterAlbumRoutes(rg *gin.RouterGroup) {
 	album := rg.Group("/albums")
-	album.GET("/getPublic", func(c *gin.Context) {
-		albums, err := services.GetPublicAlbums()
+	album.GET("/getAlbumsInParent", func(c *gin.Context) {
+		accessToken := c.GetHeader("Authorization")
+		if accessToken == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			return
+		}
+		var request struct {
+			ParentID string `json:"parentId"`
+		}
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		albums, err := services.GetAlbumsInParent(request.ParentID, accessToken)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
