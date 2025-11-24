@@ -1,4 +1,4 @@
-## Raster: A Simple and Powerful Self-Hosted Photo/Video Management Solution
+## Raster: A Simple and Powerful Self-Hosted Media Gallery
 
 Raster is a free and open-source photo/video management solution, with a focus on simplicity where it matters.
 
@@ -8,11 +8,11 @@ I started developing Raster because I found the other self-hosted galleries eith
 I wanted a solution that was:
 - Lightweight and easy to run
 - Simple, clean UI
-- Albums, content tags, and descriptions
+- Had albums, content tags, and descriptions
 - Public albums for showcasing work
 - Private shared albums with multi-user uploads
 - Comments and likes in shared albums
-- Proper panorama support
+- Proper panorama/large image support
 - Modern tech stack
 
 ## Quick start
@@ -40,7 +40,27 @@ npm run dev
 - `frontend/`: React app (Vite, Tailwind)
 
 ## Status
-In early development. Expect rapid updates.
+Currently supports:
+- Creating albums
+- Uploading/viewing images
+- Protected root user and anon/guest account
+
+Features needed before v1 release:
+- Image metadata editing
+- Album editing
+- Album thumbnails
+- Video support
+- Image/Album deleting
+- User access management
+- Mobile support
+
+Planned features for v2:
+- Auto-tiling for large images
+- Comments and liking
+- Image tags
+- Smart image search
+- Extremely granular configuration
+- S3/Cloud bucket storage backend
 
 ## Contributing
 Issues and PRs are welcome.
