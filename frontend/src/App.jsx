@@ -1,4 +1,5 @@
 import { Navigate, Routes, Route, useNavigate, useLocation } from 'react-router-dom'
+import Viewer from './viewer'
 import Gallery from './gallery'
 import Login from './account/login'
 import { getServerUrl } from './hooks/getConstants'
@@ -41,6 +42,7 @@ function App() {
         <Routes>
           <Route path="/" element={<RedirectHandler />} />
           <Route path="/gallery/*" element={<Gallery />} />
+          <Route path="/viewer/:albumId/:mediaId" element={<Viewer />} />
           <Route path="/login" element={<Login />} />
           <Route path="/onboarding/createRootUser" element={<CreateRootUser />} />
         </Routes>

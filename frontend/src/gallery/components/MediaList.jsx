@@ -5,14 +5,14 @@ import { useState, useEffect } from 'react'
 import { getServerUrl } from '../../hooks/getConstants'
 import { useAccount } from '../../contexts/useAccount'
 import { useNotifier } from '../../contexts/useNotifier'
-
+import { useNavigate } from 'react-router-dom'
 export default function MediaList({ albumId, albumName }) {
     const { getAccessToken } = useAccount()
     const [open, setOpen] = useState(false)
     const [media, setMedia] = useState([])
     const [aspectRatios, setAspectRatios] = useState({})
     const { showError } = useNotifier()
-
+    const navigate = useNavigate()
     useEffect(() => {
         let ignore = false;
         const getMedia = async () => {
@@ -73,10 +73,16 @@ export default function MediaList({ albumId, albumName }) {
                                 flexGrow: ar,
                                 flexBasis: `${220 * ar}px`,
                             }}
-                            className="relative bg-[#1A1A1A] rounded-md overflow-hidden border border-[#2B2B2B] min-w-[100px]"
+                            className="relative bg-[#1A1A1A] rounded-md overflow-hidden border border-[#2B2B2B] min-w-[100px] hover:scale-102 transition-all duration-300 cursor-pointer"
+                            onClick={() => {
+                                navigate(`/viewer/${albumId ? albumId : 'root'}/${item.ID}`)
+                            }}
                         >
+                            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#1A1A1A] via-transparent to-transparent flex items-start justify-start opacity-0 hover:opacity-100 transition-all duration-300">
+                                <p className="text-white text-sm truncate max-w-[100%] p-2 red-hat-mono">{item.Title}</p>
+                            </div>
                             <AuthImage
-                                src={`${getServerUrl()}/api/media/${albumId ? albumId : 'root'}/${item.ID}`}
+                                src={`${getServerUrl()}/api/media/thumb/${albumId ? albumId : 'root'}/${item.ID}`}
                                 token={getAccessToken()}
                                 alt={item.Title}
                                 className="w-full h-full object-cover"

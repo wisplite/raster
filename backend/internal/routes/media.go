@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wisplite/raster/internal/services"
@@ -102,5 +103,54 @@ func RegisterMediaRoutes(rg *gin.RouterGroup) {
 			return
 		}
 		c.File(mediaData.Path)
+	})
+	media.GET("/thumb/:albumId/:mediaId", func(c *gin.Context) {
+		albumID := c.Param("albumId")
+		mediaID := c.Param("mediaId")
+		widthStr := c.Query("width")
+		heightStr := c.Query("height")
+		width, _ := strconv.Atoi(widthStr)
+		height, _ := strconv.Atoi(heightStr)
+
+		if albumID == "root" {
+			albumID = ""
+		}
+		isPublic, err := services.IsAlbumPublic(albumID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		allowed := false
+		if isPublic {
+			allowed = true
+		} else {
+			accessToken := c.GetHeader("Authorization")
+			userID, err := services.ValidateAccessToken(accessToken)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			accessLevel, err := services.CheckUserAlbumAccess(userID, albumID)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			if accessLevel >= 0 {
+				allowed = true
+			} else {
+				c.JSON(http.StatusForbidden, gin.H{"error": "user does not have permission to view media in this album"})
+				return
+			}
+		}
+
+		if allowed {
+			thumbPath, err := services.GetThumbnail(albumID, mediaID, width, height)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				return
+			}
+			c.File(thumbPath)
+		}
 	})
 }
