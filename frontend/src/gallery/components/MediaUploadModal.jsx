@@ -103,7 +103,7 @@ export default function MediaUploadModal({ open, onOpenChange, trigger, albumNam
     }
 
     return (
-        <Modal open={open} onOpenChange={onOpenChange} trigger={trigger} title={`Upload to ${albumName || 'Album'}`}>
+        <Modal open={open} onOpenChange={onOpenChange} trigger={trigger} isProtected={true} title={`Upload to ${albumName || 'Album'}`}>
             <div className="flex flex-col gap-4">
                 {/* File Selection Area */}
                 <div

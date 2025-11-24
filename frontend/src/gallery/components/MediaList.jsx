@@ -1,4 +1,4 @@
-import { Upload } from 'lucide-react'
+import { EllipsisVertical, Upload } from 'lucide-react'
 import MediaUploadModal from './MediaUploadModal'
 import AuthImage from '../../components/AuthImage'
 import { useState, useEffect } from 'react'
@@ -50,6 +50,12 @@ export default function MediaList({ albumId, albumName }) {
                 <h1 className="text-xl font-bold text-white red-hat-mono">Media</h1>
                 <Upload className="w-6 h-6 cursor-pointer" color="white" onClick={() => setOpen(true)} />
             </div>
+            <MediaUploadModal
+                open={open}
+                onOpenChange={setOpen}
+                albumId={albumId}
+                albumName={albumName}
+            />
 
             {/* Media Grid */}
             <div className="flex flex-wrap justify-start gap-2 w-full px-6">
@@ -80,6 +86,12 @@ export default function MediaList({ albumId, albumName }) {
                         >
                             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#1A1A1A] via-transparent to-transparent flex items-start justify-start opacity-0 hover:opacity-100 transition-all duration-300">
                                 <p className="text-white text-sm truncate max-w-[100%] p-2 red-hat-mono">{item.Title}</p>
+                                <button className="text-white px-1 py-1 rounded-md absolute top-2 right-2 cursor-pointer z-50" onClick={(e) => {
+                                    e.stopPropagation()
+                                    setOpen(true)
+                                }}>
+                                    <EllipsisVertical className="w-4 h-4" />
+                                </button>
                             </div>
                             <AuthImage
                                 src={`${getServerUrl()}/api/media/thumb/${albumId ? albumId : 'root'}/${item.ID}`}
