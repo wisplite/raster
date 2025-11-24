@@ -30,40 +30,68 @@ export default function MediaUploadModal({ open, onOpenChange, trigger, albumNam
     }
 
     const handleUpload = async () => {
-        // Placeholder for server-side logic hook
-        const performUpload = async (fileWrapper) => {
-            // TODO: Implement actual server upload here
-            // Example:
-            // const formData = new FormData()
-            // formData.append('file', fileWrapper.file)
-            // formData.append('albumId', albumId)
-            // await fetch('/api/upload', { method: 'POST', body: formData, ... })
+        const pendingFiles = files.filter(f => f.status === 'pending')
+        if (pendingFiles.length === 0) return
 
-            const formData = new FormData()
-            formData.append('file', fileWrapper.file)
-            formData.append('albumId', albumId)
-            const response = await fetch(`${getServerUrl()}/api/media/uploadMedia`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Authorization': getAccessToken(),
-                },
+        setFiles(prev => prev.map(f => f.status === 'pending' ? { ...f, status: 'uploading' } : f))
+
+        const uploadFile = (fileWrapper) => {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest()
+                const formData = new FormData()
+                formData.append('file', fileWrapper.file)
+                formData.append('albumId', albumId)
+
+                xhr.upload.addEventListener('progress', (event) => {
+                    if (event.lengthComputable) {
+                        const progress = Math.round((event.loaded / event.total) * 100)
+                        setFiles(prev => prev.map(f => f.id === fileWrapper.id ? { ...f, progress } : f))
+                    }
+                })
+
+                xhr.addEventListener('load', () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            const data = JSON.parse(xhr.responseText)
+                            if (data.error) {
+                                setFiles(prev => prev.map(f => f.id === fileWrapper.id ? { ...f, status: 'error' } : f))
+                                reject(data.error)
+                            } else {
+                                setFiles(prev => prev.map(f => f.id === fileWrapper.id ? { ...f, status: 'completed', progress: 100 } : f))
+                                resolve(data)
+                            }
+                        } catch (e) {
+                            setFiles(prev => prev.map(f => f.id === fileWrapper.id ? { ...f, status: 'error' } : f))
+                            reject(e)
+                        }
+                    } else {
+                        setFiles(prev => prev.map(f => f.id === fileWrapper.id ? { ...f, status: 'error' } : f))
+                        reject(new Error(xhr.statusText))
+                    }
+                })
+
+                xhr.addEventListener('error', () => {
+                    setFiles(prev => prev.map(f => f.id === fileWrapper.id ? { ...f, status: 'error' } : f))
+                    reject(new Error('Network Error'))
+                })
+
+                xhr.open('POST', `${getServerUrl()}/api/media/uploadMedia`)
+                xhr.setRequestHeader('Authorization', getAccessToken())
+                xhr.send(formData)
             })
-            const data = await response.json()
-            if (data.error) {
-                showError(data.error)
-            } else {
-                setFiles(prev => prev.map(f => f.id === fileWrapper.id ? { ...f, status: 'completed' } : f))
-                showSuccess('Media uploaded successfully')
-            }
         }
 
-        // Start uploads
-        files.forEach(fileWrapper => {
-            if (fileWrapper.status === 'pending') {
-                performUpload(fileWrapper)
-            }
-        })
+        const results = await Promise.allSettled(pendingFiles.map(f => uploadFile(f)))
+
+        const failedCount = results.filter(r => r.status === 'rejected').length
+        const successCount = results.filter(r => r.status === 'fulfilled').length
+
+        if (failedCount > 0) {
+            showError(`${failedCount} file(s) failed to upload`)
+        }
+        if (successCount > 0) {
+            showSuccess(`${successCount} file(s) uploaded successfully`)
+        }
     }
 
     const formatFileSize = (bytes) => {

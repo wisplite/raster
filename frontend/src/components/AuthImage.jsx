@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function AuthImage({ src, token, alt, className, ...props }) {
+export default function AuthImage({ src, token, alt, className, onLoad, ...props }) {
     const [imageSrc, setImageSrc] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
@@ -8,6 +8,7 @@ export default function AuthImage({ src, token, alt, className, ...props }) {
     useEffect(() => {
         let objectUrl = null
         let active = true
+        const controller = new AbortController()
 
         const fetchImage = async () => {
             setLoading(true)
@@ -16,7 +17,8 @@ export default function AuthImage({ src, token, alt, className, ...props }) {
                 const response = await fetch(src, {
                     headers: {
                         'Authorization': token
-                    }
+                    },
+                    signal: controller.signal
                 })
 
                 if (!response.ok) {
@@ -28,6 +30,11 @@ export default function AuthImage({ src, token, alt, className, ...props }) {
                     objectUrl = URL.createObjectURL(blob)
                     setImageSrc(objectUrl)
                     setLoading(false)
+                    if (onLoad) {
+                        setTimeout(() => {
+                            onLoad()
+                        }, 500)
+                    }
                 }
             } catch (err) {
                 if (active) {
@@ -46,6 +53,7 @@ export default function AuthImage({ src, token, alt, className, ...props }) {
 
         return () => {
             active = false
+            controller.abort()
             if (objectUrl) {
                 URL.revokeObjectURL(objectUrl)
             }
