@@ -44,6 +44,10 @@ export default function MediaList({ albumId, albumName }) {
         }
     }
 
+    useEffect(() => {
+        console.log(media)
+    }, [media])
+
     return (
         <div className="flex flex-col items-center justify-start w-full bg-[#141414]">
             <div className="flex flex-row items-center justify-between gap-2 w-full px-6 py-4">
@@ -75,7 +79,7 @@ export default function MediaList({ albumId, albumName }) {
                         <div
                             key={item.ID}
                             style={{
-                                height: '220px',
+                                aspectRatio: ar,
                                 flexGrow: ar,
                                 flexBasis: `${220 * ar}px`,
                             }}

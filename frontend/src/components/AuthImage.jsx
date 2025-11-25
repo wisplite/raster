@@ -30,11 +30,6 @@ export default function AuthImage({ src, token, alt, className, onLoad, ...props
                     objectUrl = URL.createObjectURL(blob)
                     setImageSrc(objectUrl)
                     setLoading(false)
-                    if (onLoad) {
-                        setTimeout(() => {
-                            onLoad()
-                        }, 500)
-                    }
                 }
             } catch (err) {
                 if (active) {
@@ -68,6 +63,6 @@ export default function AuthImage({ src, token, alt, className, onLoad, ...props
         return <div className={`bg-gray-800 flex items-center justify-center text-gray-500 ${className}`}>Error</div>
     }
 
-    return <img src={imageSrc} alt={alt} className={className} {...props} />
+    return <img src={imageSrc} alt={alt} className={className} onLoad={onLoad} {...props} />
 }
 

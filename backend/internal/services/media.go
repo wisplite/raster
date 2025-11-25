@@ -185,7 +185,7 @@ func GetThumbnail(albumID string, mediaID string, width int, height int) (string
 		}
 	}
 
-	dstImage := imaging.Fill(srcImage, width, height, imaging.Center, imaging.Lanczos)
+	dstImage := imaging.Fit(srcImage, width, height, imaging.Lanczos)
 
 	err = imaging.Save(dstImage, thumbPath)
 	if err != nil {
