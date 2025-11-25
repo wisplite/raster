@@ -1,13 +1,16 @@
-import { PlusIcon } from 'lucide-react'
+import { PlusIcon, EllipsisVertical } from 'lucide-react'
 import AlbumCreateModal from './AlbumCreateModal'
 import { useState, useEffect } from 'react'
 import { getServerUrl } from '../../hooks/getConstants'
 import { useAccount } from '../../contexts/useAccount'
 import { useNavigate } from 'react-router-dom'
 import { useNotifier } from '../../contexts/useNotifier'
+import AlbumEditModal from './AlbumEditModal'
 export default function AlbumList({ currentAlbumName }) {
     const { getAccessToken } = useAccount()
     const [open, setOpen] = useState(false)
+    const [openEdit, setOpenEdit] = useState(false)
+    const [editingAlbum, setEditingAlbum] = useState(null)
     const [albums, setAlbums] = useState([])
     const navigate = useNavigate()
     const { showError } = useNotifier()
@@ -43,11 +46,11 @@ export default function AlbumList({ currentAlbumName }) {
             }
         }
 
-        if (!open && currentAlbumName !== null) {
+        if (!open && !openEdit && currentAlbumName !== null) {
             getAlbums()
         }
         return () => { ignore = true; }
-    }, [currentAlbumName, open])
+    }, [currentAlbumName, open, openEdit])
     return (
         <div className="flex flex-col items-center justify-start h-min w-full bg-[#141414]">
             <div className="flex flex-row items-center justify-between gap-2 w-full px-6 py-4">
@@ -57,6 +60,7 @@ export default function AlbumList({ currentAlbumName }) {
             <div className="flex flex-row items-center justify-start gap-2 w-full px-6 flex-wrap">
                 {albums.map((album) => (
                     <div
+                        key={album.ID}
                         className="flex flex-row items-center justify-start gap-2 w-1/8 aspect-square border border-[#2B2B2B] rounded-md px-6 py-4 cursor-pointer"
                         onClick={() => {
                             // Get current path and append the album's title
@@ -72,10 +76,25 @@ export default function AlbumList({ currentAlbumName }) {
                         }}
                     >
                         <p className="text-white red-hat-mono">{album.Title}</p>
+                        <EllipsisVertical className="w-6 h-6 cursor-pointer" color="white" onClick={(e) => {
+                            e.stopPropagation()
+                            setEditingAlbum(album)
+                            setOpenEdit(true)
+                        }} />
                     </div>
                 ))}
             </div>
             <AlbumCreateModal open={open} onOpenChange={setOpen} parentId={currentAlbumName === 'gallery' ? '' : currentAlbumName} />
+            {editingAlbum && (
+                <AlbumEditModal
+                    open={openEdit}
+                    onOpenChange={setOpenEdit}
+                    id={editingAlbum.ID}
+                    startTitle={editingAlbum.Title}
+                    startDescription={editingAlbum.Description}
+                    currentAlbum={editingAlbum}
+                />
+            )}
         </div>
     )
 }

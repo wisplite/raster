@@ -50,7 +50,20 @@ func GetAlbumsInParent(parentID string, authToken string) ([]models.Album, error
 }
 
 func GetAlbum(id string, authToken string) (models.Album, error) {
-	// TODO: Add authentication
+	userID, err := ValidateAccessToken(authToken)
+	if err != nil {
+		return models.Album{}, err
+	}
+	if userID == "" {
+		return models.Album{}, fmt.Errorf("invalid access token")
+	}
+	accessLevel, err := CheckUserAlbumAccess(userID, id)
+	if err != nil {
+		return models.Album{}, err
+	}
+	if accessLevel < 0 {
+		return models.Album{}, fmt.Errorf("user does not have permission to view this album")
+	}
 	album := models.Album{}
 	result := db.GetDB().First(&album, "id = ?", id)
 	if result.Error != nil {
@@ -150,4 +163,46 @@ func IsAlbumPublic(albumID string) (bool, error) {
 		return false, result.Error
 	}
 	return !album.Private, nil
+}
+
+func EditAlbum(accessToken string, id string, properties map[string]interface{}) (models.Album, error) {
+	userID, err := ValidateAccessToken(accessToken)
+	if err != nil {
+		return models.Album{}, err
+	}
+	if userID == "" {
+		return models.Album{}, fmt.Errorf("invalid access token")
+	}
+	accessLevel, err := CheckUserAlbumAccess(userID, id)
+	if err != nil {
+		return models.Album{}, err
+	}
+	if accessLevel < 2 {
+		return models.Album{}, fmt.Errorf("user does not have permission to edit this album")
+	}
+	if properties["id"] != nil {
+		return models.Album{}, fmt.Errorf("cannot edit album ID")
+	}
+	if properties["private"] != nil {
+		return models.Album{}, fmt.Errorf("cannot edit album private status directly (use the dedicated endpoint for this)")
+	}
+	if properties["parent_id"] != nil {
+		return models.Album{}, fmt.Errorf("cannot edit album parent ID directly (use the dedicated endpoint for this)")
+	}
+	if properties["updated_at"] != nil {
+		return models.Album{}, fmt.Errorf("cannot edit album updatedAt")
+	}
+	if properties["created_at"] != nil {
+		return models.Album{}, fmt.Errorf("cannot edit album createdAt")
+	}
+
+	album := models.Album{}
+	result := db.GetDB().Model(&album).Where("id = ?", id).Updates(properties).First(&album)
+	if result.Error != nil {
+		return models.Album{}, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return models.Album{}, fmt.Errorf("failed to update album")
+	}
+	return album, nil
 }
