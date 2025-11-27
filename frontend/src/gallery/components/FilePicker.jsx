@@ -5,12 +5,13 @@ import { useAccount } from '../../contexts/useAccount'
 import { getServerUrl } from '../../hooks/getConstants'
 import { useNotifier } from '../../contexts/useNotifier'
 import { ArrowLeft } from 'lucide-react'
-export default function FilePicker({ currentAlbum }) {
+import AuthImage from '../../components/AuthImage'
+export default function FilePicker({ currentAlbum, onFileSelect }) {
     const [selectedFile, setSelectedFile] = useState(null)
     const [selectedAlbum, setSelectedAlbum] = useState(currentAlbum)
     const [currentPath, setCurrentPath] = useState([])
     const [albums, setAlbums] = useState([])
-    const [media, setMedia] = useState([])
+    const [media, setMedia] = useState(null)
     const [filePickerOpen, setFilePickerOpen] = useState(false)
     const { getAccessToken } = useAccount()
     const { showError } = useNotifier()
@@ -47,6 +48,24 @@ export default function FilePicker({ currentAlbum }) {
                 showError(data.error)
             } else {
                 setSelectedAlbum(data)
+            }
+        }
+        const getMedia = async () => {
+            const response = await fetch(`${getServerUrl()}/api/media/getAllMediaInAlbum?albumId=${selectedAlbum?.ID}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': getAccessToken(),
+                },
+            })
+            const data = await response.json()
+            if (data.error) {
+                showError(data.error)
+            } else {
+                if (data.media.length === 0) {
+                    setMedia(null)
+                } else {
+                    setMedia(data.media)
+                }
             }
         }
         const reconstructPath = async () => {
@@ -99,13 +118,22 @@ export default function FilePicker({ currentAlbum }) {
         }
         getAlbum()
         reconstructPath()
+        getMedia()
     }, [selectedAlbum])
     return (
-        <div className="flex flex-row gap-2 border border-[#2B2B2B] rounded-lg p-2 cursor-pointer" onClick={() => {
-            setFilePickerOpen(true)
-        }}>
-            <File className="w-6 h-6" />
-            <p className="text-white red-hat-mono">{selectedFile?.name || 'No image selected'}</p>
+        <>
+            <div className="flex flex-row gap-2 border border-[#2B2B2B] rounded-lg p-2 cursor-pointer" onClick={() => {
+                setFilePickerOpen(true)
+            }}>
+                <File className="w-6 h-6 flex-shrink-0" />
+                {selectedFile?.Title ? (
+                    <p className="text-white red-hat-mono truncate flex-1 min-w-0" dir="rtl">
+                        <span dir="ltr">{currentPath.join(' / ') + ' / ' + selectedFile?.Title}</span>
+                    </p>
+                ) : (
+                    <p className="text-white red-hat-mono">No image selected</p>
+                )}
+            </div>
             <Modal open={filePickerOpen} onOpenChange={setFilePickerOpen} title="Select File">
                 <div className="flex flex-col gap-2">
                     <div className="flex flex-row gap-2 items-center justify-start">
@@ -123,14 +151,23 @@ export default function FilePicker({ currentAlbum }) {
                         </div>
                     ))}
                     <hr className="border-[#2B2B2B] my-2" />
-                    {media.length === 0 && (
+                    {media === null && (
                         <p className="text-white red-hat-mono">No media found</p>
                     )}
-                    {media.length > 0 && (
+                    {media && media.length === 0 && (
+                        <p className="text-white red-hat-mono">Loading...</p>
+                    )}
+                    {media && media.length > 0 && (
                         <div className="flex flex-col gap-2">
                             {media.map((m) => (
-                                <div key={m.ID} className="flex flex-row gap-2 cursor-pointer hover:bg-[#2B2B2B] rounded-md p-2 border border-[#2B2B2B]">
-                                    <File className="w-6 h-6" />
+                                <div key={m.ID} className="flex flex-row gap-2 cursor-pointer hover:bg-[#2B2B2B] rounded-md p-2 border border-[#2B2B2B] items-center justify-start" onClick={() => {
+                                    setSelectedFile(m)
+                                    if (onFileSelect) {
+                                        onFileSelect({ selectedFile: m, selectedAlbum: selectedAlbum, currentPath: currentPath })
+                                    }
+                                    setFilePickerOpen(false)
+                                }}>
+                                    <AuthImage src={`${getServerUrl()}/api/media/thumb/${selectedAlbum?.ID}/${m.ID}`} token={getAccessToken()} className="w-10 h-10 object-cover rounded-md" />
                                     <p className="text-white red-hat-mono">{m.Title}</p>
                                 </div>
                             ))}
@@ -138,6 +175,6 @@ export default function FilePicker({ currentAlbum }) {
                     )}
                 </div>
             </Modal>
-        </div>
+        </>
     )
 }

@@ -8,6 +8,7 @@ export default function AlbumEditModal({ open, onOpenChange, trigger, id, startT
     const { getAccessToken } = useAccount()
     const [title, setTitle] = useState(startTitle || '')
     const [description, setDescription] = useState(startDescription || '')
+    const [thumbnail, setThumbnail] = useState(null)
     const { showError } = useNotifier()
     const handleEditAlbum = async () => {
         const response = await fetch(`${getServerUrl()}/api/albums/editAlbum`, {
@@ -21,6 +22,7 @@ export default function AlbumEditModal({ open, onOpenChange, trigger, id, startT
                 properties: {
                     title: title,
                     description: description,
+                    thumbnail: thumbnail,
                 }
             })
         })
@@ -37,6 +39,10 @@ export default function AlbumEditModal({ open, onOpenChange, trigger, id, startT
             setDescription(startDescription || '')
         }
     }, [open])
+    const handleFileSelect = (file) => {
+        console.log(file)
+        setThumbnail(file.selectedAlbum.ID + '/' + file.selectedFile.ID)
+    }
     return (
         <Modal open={open} onOpenChange={onOpenChange} trigger={trigger} title="Edit Album">
             <div className="flex flex-col gap-2">
@@ -45,7 +51,7 @@ export default function AlbumEditModal({ open, onOpenChange, trigger, id, startT
                 <p className="text-white red-hat-mono">Description</p>
                 <textarea type="text" placeholder="Description" className="w-full h-[20vh] px-3 py-2.5 bg-[#141414] border border-[#2B2B2B] rounded-md text-white placeholder-gray-600 focus:outline-none focus:border-[#3B3B3B] transition-colors red-hat-text resize-none" value={description} onChange={(e) => setDescription(e.target.value)} />
                 <p className="text-white red-hat-mono">Thumbnail</p>
-                <FilePicker currentAlbum={currentAlbum} />
+                <FilePicker currentAlbum={currentAlbum} onFileSelect={handleFileSelect} />
                 <button className="w-full py-2.5 bg-[#2B2B2B] hover:bg-[#3B3B3B] text-white rounded-md font-medium transition-colors red-hat-mono cursor-pointer mt-2" onClick={handleEditAlbum}>Save Changes</button>
             </div>
         </Modal>
