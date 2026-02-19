@@ -58,6 +58,10 @@ export default function MetadataPanel({ mediaItem, open, onOpenChange }) {
                             <span className="text-gray-500">Focal Length</span>
                             <span className="text-white">{mediaItem.Metadata?.exif?.focalLength + 'mm' || '-'}</span>
                         </div>
+                        <div className="flex justify-between">
+                            <span className="text-gray-500">Lens</span>
+                            <span className="text-white">{mediaItem.Metadata?.exif?.lensModel.replaceAll('"', '') || '-'}</span>
+                        </div>
                     </div>
                 </div>
 
