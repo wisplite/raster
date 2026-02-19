@@ -1,4 +1,4 @@
-import { EllipsisVertical, Upload } from 'lucide-react'
+import { EllipsisVertical, Upload, Pencil, Trash2, Share2 } from 'lucide-react'
 import MediaUploadModal from './MediaUploadModal'
 import AuthImage from '../../components/AuthImage'
 import { useState, useEffect } from 'react'
@@ -6,11 +6,13 @@ import { getServerUrl } from '../../hooks/getConstants'
 import { useAccount } from '../../contexts/useAccount'
 import { useNotifier } from '../../contexts/useNotifier'
 import { useNavigate } from 'react-router-dom'
+import * as Popover from '@radix-ui/react-popover'
 export default function MediaList({ albumId, albumName }) {
     const { getAccessToken } = useAccount()
     const [open, setOpen] = useState(false)
     const [media, setMedia] = useState([])
     const [aspectRatios, setAspectRatios] = useState({})
+    const [openPopoverId, setOpenPopoverId] = useState(null)
     const { showError, showInfo } = useNotifier()
     const navigate = useNavigate()
     useEffect(() => {
@@ -92,14 +94,42 @@ export default function MediaList({ albumId, albumName }) {
                                 navigate(`/viewer/${albumId ? albumId : 'root'}/${item.ID}`)
                             }}
                         >
-                            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#1A1A1A] via-transparent to-transparent flex items-start justify-start opacity-0 hover:opacity-100 transition-all duration-300">
+                            <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#1A1A1A] via-transparent to-transparent flex items-start justify-start transition-all duration-300 ${openPopoverId === item.ID ? 'opacity-100' : 'opacity-0 hover:opacity-100'}`}>
                                 <p className="text-white text-sm truncate max-w-[90%] p-2 red-hat-text">{item.Title}</p>
-                                <button className="text-white px-1 py-1 rounded-md absolute top-2 right-2 cursor-pointer z-50" onClick={(e) => {
-                                    e.stopPropagation()
-                                    setOpen(true)
-                                }}>
-                                    <EllipsisVertical className="w-4 h-4" />
-                                </button>
+                                <Popover.Root
+                                    open={openPopoverId === item.ID}
+                                    onOpenChange={(isOpen) => setOpenPopoverId(isOpen ? item.ID : null)}
+                                >
+                                    <Popover.Trigger asChild>
+                                        <button className="text-white px-1 py-1 rounded-md absolute top-2 right-2 cursor-pointer z-50" onClick={(e) => {
+                                            e.stopPropagation()
+                                        }}>
+                                            <EllipsisVertical className="w-4 h-4" />
+                                        </button>
+                                    </Popover.Trigger>
+                                    <Popover.Portal>
+                                        <Popover.Content
+                                            align="start"
+                                            sideOffset={8}
+                                            className="z-50 min-w-[140px] rounded-lg border border-[#2B2B2B] bg-[#1A1A1A] p-1 shadow-xl"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <button className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm text-white hover:bg-[#2B2B2B] transition-colors red-hat-text cursor-pointer">
+                                                <Pencil className="w-3.5 h-3.5 text-gray-400" />
+                                                Edit
+                                            </button>
+                                            <button className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm text-white hover:bg-[#2B2B2B] transition-colors red-hat-text cursor-pointer">
+                                                <Share2 className="w-3.5 h-3.5 text-gray-400" />
+                                                Share
+                                            </button>
+                                            <div className="my-1 h-px bg-[#2B2B2B]" />
+                                            <button className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm text-red-400 hover:bg-[#2B2B2B] transition-colors red-hat-text cursor-pointer">
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                                Delete
+                                            </button>
+                                        </Popover.Content>
+                                    </Popover.Portal>
+                                </Popover.Root>
                             </div>
                             <AuthImage
                                 src={`${getServerUrl()}/api/media/thumb/${albumId ? albumId : 'root'}/${item.ID}`}
