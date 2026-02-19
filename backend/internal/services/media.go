@@ -41,6 +41,7 @@ func UploadMedia(file *multipart.FileHeader, albumID string, accessToken string)
 		"originalFilename": file.Filename,
 		"fileSize":         file.Size,
 		"contentType":      file.Header.Get("Content-Type"),
+		"exif":             map[string]interface{}{},
 	}
 
 	src, err := file.Open()
@@ -64,6 +65,63 @@ func UploadMedia(file *multipart.FileHeader, albumID string, accessToken string)
 							metadataMap["width"] = cfg.Height
 							metadataMap["height"] = cfg.Width
 						}
+					}
+				}
+				model, err := x.Get(exif.Model)
+				if err == nil {
+					val := model.String()
+					metadataMap["exif"].(map[string]interface{})["model"] = val
+				}
+				iso, err := x.Get(exif.ISOSpeedRatings)
+				if err == nil {
+					val, err := iso.Int(0)
+					if err == nil {
+						metadataMap["exif"].(map[string]interface{})["iso"] = val
+					}
+				}
+				aperture, err := x.Get(exif.FNumber)
+				if err == nil {
+					val, err := aperture.Rat(0)
+					if err == nil {
+						metadataMap["exif"].(map[string]interface{})["aperture"] = val
+					}
+				}
+				shutterSpeed, err := x.Get(exif.ShutterSpeedValue)
+				if err == nil {
+					val, err := shutterSpeed.Rat(0)
+					if err == nil {
+						metadataMap["exif"].(map[string]interface{})["shutterSpeed"] = val
+					}
+				}
+				focalLength, err := x.Get(exif.FocalLength)
+				if err == nil {
+					val, err := focalLength.Rat(0)
+					if err == nil {
+						metadataMap["exif"].(map[string]interface{})["focalLength"] = val
+					}
+				}
+				lensModel, err := x.Get(exif.LensModel)
+				if err == nil {
+					val := lensModel.String()
+					metadataMap["exif"].(map[string]interface{})["lensModel"] = val
+				}
+				lensMake, err := x.Get(exif.LensMake)
+				if err == nil {
+					val := lensMake.String()
+					metadataMap["exif"].(map[string]interface{})["lensMake"] = val
+				}
+				exposureTime, err := x.Get(exif.ExposureTime)
+				if err == nil {
+					val, err := exposureTime.Rat(0)
+					if err == nil {
+						metadataMap["exif"].(map[string]interface{})["exposureTime"] = val
+					}
+				}
+				exposureBiasValue, err := x.Get(exif.ExposureBiasValue)
+				if err == nil {
+					val, err := exposureBiasValue.Rat(0)
+					if err == nil {
+						metadataMap["exif"].(map[string]interface{})["exposureBiasValue"] = val
 					}
 				}
 			}
