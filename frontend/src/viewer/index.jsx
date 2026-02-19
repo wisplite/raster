@@ -5,7 +5,7 @@ import MetadataPanel from './components/MetadataPanel'
 import { useAccount } from '../contexts/useAccount'
 import { getServerUrl } from '../hooks/getConstants'
 import { useNotifier } from '../contexts/useNotifier'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, PanelRightClose, PanelRightOpen } from 'lucide-react'
 
 export default function Viewer() {
     const { albumId, mediaId } = useParams()
@@ -14,6 +14,7 @@ export default function Viewer() {
     const { getAccessToken } = useAccount()
     const { showError } = useNotifier()
     const [mediaItem, setMediaItem] = useState(location.state?.mediaItem || null)
+    const [metadataPanelOpen, setMetadataPanelOpen] = useState(false)
 
     useEffect(() => {
         if (mediaItem) return
@@ -32,17 +33,17 @@ export default function Viewer() {
                 const data = await response.json()
 
                 if (data.error) {
-                    showError(data.error)
+                    showError("Error getting media details: " + data.error)
                 } else {
                     const found = data.media.find(m => m.ID === mediaId)
                     if (found) {
                         setMediaItem(found)
                     } else {
-                        showError("Media not found")
+                        showError("Media not found in album")
                     }
                 }
             } catch (err) {
-                showError("Failed to fetch media details")
+                showError("Failed to fetch media details: " + err.message)
             }
         }
 
@@ -59,24 +60,29 @@ export default function Viewer() {
     }
 
     return (
-        <div className="flex flex-col h-screen w-full bg-[#141414]">
-            <div className="flex items-center h-14 px-4 border-b border-[#2B2B2B] bg-[#141414] flex-shrink-0 gap-4">
-                <button onClick={handleBack} className="text-gray-400 hover:text-white transition-colors p-1 cursor-pointer">
-                    <ArrowLeft size={20} />
+        <div className="flex flex-col h-dvh w-full bg-[#141414]">
+            <div className="flex items-center h-14 px-4 border-b border-[#2B2B2B] bg-[#141414] flex-shrink-0 gap-4 justify-between">
+                <div className="flex items-center gap-2">
+                    <button onClick={handleBack} className="text-gray-400 hover:text-white transition-colors p-1 cursor-pointer">
+                        <ArrowLeft size={20} />
+                    </button>
+                    <span className="text-white font-medium truncate red-hat-text">
+                        {mediaItem ? mediaItem.Title : 'Loading...'}
+                    </span>
+                </div>
+                <button onClick={() => setMetadataPanelOpen(!metadataPanelOpen)} className="text-gray-400 hover:text-white transition-colors p-1 cursor-pointer">
+                    {metadataPanelOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
                 </button>
-                <span className="text-white font-medium truncate red-hat-mono">
-                    {mediaItem ? mediaItem.Title : 'Loading...'}
-                </span>
             </div>
 
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
                 <ImageViewer
                     albumId={albumId === 'root' ? '' : albumId}
                     mediaId={mediaId}
                     token={getAccessToken()}
                     title={mediaItem?.Title || ''}
                 />
-                <MetadataPanel mediaItem={mediaItem} />
+                <MetadataPanel mediaItem={mediaItem} open={metadataPanelOpen} />
             </div>
         </div>
     )

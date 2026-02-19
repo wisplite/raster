@@ -8,7 +8,7 @@ export default function ImageViewer({ albumId, mediaId, token, title }) {
     const [loaded, setLoaded] = useState(false)
 
     return (
-        <div className="flex-1 flex items-center justify-center bg-black relative overflow-hidden h-full">
+        <div className="flex-1 flex items-center justify-center bg-black relative overflow-hidden">
             <AuthImage
                 src={src}
                 token={token}

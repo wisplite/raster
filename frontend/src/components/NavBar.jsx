@@ -10,11 +10,11 @@ export default function NavBar({ path }) {
         <div className="flex flex-row items-center justify-between h-[10vh] w-full px-6 py-2 border-b border-[#2B2B2B] shrink-0">
             <div className="flex flex-row items-center justify-start gap-2">
                 {path.map((item, index) => (
-                    <div className="flex flex-row items-center justify-start gap-2 red-hat-mono">
+                    <div className="flex flex-row items-center justify-start gap-2 text-2xl red-hat-display">
                         <Link to={`/${path.slice(0, index + 1).join('/')}`} key={item} className={`text-white ${index === path.length - 1 ? 'font-bold' : ''}`}>
                             {decodeURIComponent(item)}
                         </Link>
-                        {index !== path.length - 1 && <p className="text-white red-hat-mono">/</p>}
+                        {index !== path.length - 1 && <p className="text-white text-xl red-hat-display">/</p>}
                     </div>
                 ))}
             </div>

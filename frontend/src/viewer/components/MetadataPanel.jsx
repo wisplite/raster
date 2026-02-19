@@ -1,14 +1,14 @@
-export default function MetadataPanel({ mediaItem }) {
+export default function MetadataPanel({ mediaItem, open, onOpenChange }) {
     if (!mediaItem) return <div className="w-80 bg-[#1A1A1A] h-full border-l border-[#2B2B2B] p-4 text-white">Loading...</div>
 
     return (
-        <div className="w-80 bg-[#1A1A1A] h-full border-l border-[#2B2B2B] p-6 text-white overflow-y-auto flex-shrink-0">
-            <h2 className="text-xl font-bold mb-6 red-hat-mono break-words">{mediaItem.Title}</h2>
+        <div className={`w-full md:w-80 bg-[#1A1A1A] h-72 md:h-full border-t md:border-t-0 md:border-l border-[#2B2B2B] p-6 text-white overflow-y-auto flex-shrink-0 ${open ? 'block' : 'hidden'}`}>
+            <h2 className="text-xl font-bold mb-6 red-hat-display break-words">{mediaItem.Title}</h2>
 
             <div className="space-y-6">
                 <div className="space-y-2">
                     <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Details</h3>
-                    <div className="bg-[#222] rounded p-3 space-y-2 text-sm">
+                    <div className="bg-[#222] rounded p-3 space-y-2 text-sm red-hat-mono">
                         <div className="flex justify-between">
                             <span className="text-gray-500">Type</span>
                             <span className="text-white">{mediaItem.Type || 'Unknown'}</span>
@@ -25,7 +25,7 @@ export default function MetadataPanel({ mediaItem }) {
                     </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 red-hat-mono">
                     <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">EXIF Data</h3>
                     <p className="text-xs text-gray-500 italic">Metadata editing not yet implemented.</p>
                     {/* Placeholder for EXIF data */}

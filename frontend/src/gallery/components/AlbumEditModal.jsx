@@ -28,7 +28,7 @@ export default function AlbumEditModal({ open, onOpenChange, trigger, id, startT
         })
         const data = await response.json()
         if (data.error) {
-            showError(data.error)
+            showError("Error editing album: " + data.error)
         } else {
             onOpenChange(false)
         }

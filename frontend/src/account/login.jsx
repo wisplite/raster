@@ -14,7 +14,7 @@ export default function Login() {
                 navigate('/gallery')
             })
             .catch((error) => {
-                showError(error.message)
+                showError("Error logging in: " + error.message)
             })
     }
     return (

@@ -21,7 +21,7 @@ export default function CreateRootUser() {
         })
         const data = await response.json()
         if (data.error) {
-            showError(data.error)
+            showError("Error creating root user: " + data.error)
         } else {
             const rootResponse = await fetch(`${getServerUrl()}/api/user/setRootUser`, {
                 method: 'POST',
@@ -34,7 +34,7 @@ export default function CreateRootUser() {
             })
             const rootData = await rootResponse.json()
             if (rootData.error) {
-                showError(rootData.error)
+                showError("Error setting root user: " + rootData.error)
             } else {
                 navigate('/gallery')
                 showSuccess('Root user created successfully')

@@ -11,21 +11,25 @@ export default function MediaList({ albumId, albumName }) {
     const [open, setOpen] = useState(false)
     const [media, setMedia] = useState([])
     const [aspectRatios, setAspectRatios] = useState({})
-    const { showError } = useNotifier()
+    const { showError, showInfo } = useNotifier()
     const navigate = useNavigate()
     useEffect(() => {
         let ignore = false;
+        const accessToken = getAccessToken()
+        if (!accessToken || !albumId && albumName !== 'gallery') {
+            return // assuming state isn't loaded yet
+        }
         const getMedia = async () => {
             const response = await fetch(`${getServerUrl()}/api/media/getAllMediaInAlbum?albumId=${albumId}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': getAccessToken(),
+                    'Authorization': accessToken,
                 },
             })
             const data = await response.json()
             if (ignore) return
             if (data.error) {
-                showError(data.error)
+                showError("Error getting media in album: " + data.error)
             } else {
                 setMedia(data.media)
             }
@@ -51,7 +55,7 @@ export default function MediaList({ albumId, albumName }) {
     return (
         <div className="flex flex-col items-center justify-start w-full bg-[#141414]">
             <div className="flex flex-row items-center justify-between gap-2 w-full px-6 py-4">
-                <h1 className="text-xl font-bold text-white red-hat-mono">Media</h1>
+                <h1 className="text-xl font-bold text-white red-hat-display">Media</h1>
                 <Upload className="w-6 h-6 cursor-pointer" color="white" onClick={() => setOpen(true)} />
             </div>
             <MediaUploadModal
@@ -89,7 +93,7 @@ export default function MediaList({ albumId, albumName }) {
                             }}
                         >
                             <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-[#1A1A1A] via-transparent to-transparent flex items-start justify-start opacity-0 hover:opacity-100 transition-all duration-300">
-                                <p className="text-white text-sm truncate max-w-[100%] p-2 red-hat-mono">{item.Title}</p>
+                                <p className="text-white text-sm truncate max-w-[90%] p-2 red-hat-text">{item.Title}</p>
                                 <button className="text-white px-1 py-1 rounded-md absolute top-2 right-2 cursor-pointer z-50" onClick={(e) => {
                                     e.stopPropagation()
                                     setOpen(true)

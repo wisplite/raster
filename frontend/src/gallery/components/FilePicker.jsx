@@ -14,7 +14,7 @@ export default function FilePicker({ currentAlbum, onFileSelect }) {
     const [media, setMedia] = useState(null)
     const [filePickerOpen, setFilePickerOpen] = useState(false)
     const { getAccessToken } = useAccount()
-    const { showError } = useNotifier()
+    const { showError, showInfo } = useNotifier()
     useEffect(() => {
         const getAlbum = async () => {
             const response = await fetch(`${getServerUrl()}/api/albums/getAlbumsInParent`, {
@@ -28,7 +28,7 @@ export default function FilePicker({ currentAlbum, onFileSelect }) {
             })
             const data = await response.json()
             if (data.error) {
-                showError(data.error)
+                showError("Error getting albums in parent: " + data.error)
             } else {
                 setAlbums(data)
             }
@@ -45,7 +45,7 @@ export default function FilePicker({ currentAlbum, onFileSelect }) {
             })
             const data = await response.json()
             if (data.error) {
-                showError(data.error)
+                showError("Error getting album info: " + data.error)
             } else {
                 setSelectedAlbum(data)
             }
@@ -59,7 +59,7 @@ export default function FilePicker({ currentAlbum, onFileSelect }) {
             })
             const data = await response.json()
             if (data.error) {
-                showError(data.error)
+                showError("Error getting media: " + data.error)
             } else {
                 if (data.media.length === 0) {
                     setMedia(null)
@@ -99,7 +99,7 @@ export default function FilePicker({ currentAlbum, onFileSelect }) {
 
                 const data = await response.json()
                 if (data.error) {
-                    showError(data.error)
+                    showError("Error getting album: " + data.error)
                     break
                 }
 

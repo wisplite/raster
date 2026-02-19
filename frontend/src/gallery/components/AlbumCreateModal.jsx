@@ -23,7 +23,7 @@ export default function AlbumCreateModal({ open, onOpenChange, trigger, parentId
         })
         const data = await response.json()
         if (data.error) {
-            showError(data.error)
+            showError("Error creating album: " + data.error)
         } else {
             onOpenChange(false)
         }
