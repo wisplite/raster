@@ -7,8 +7,9 @@ import { useAccount } from '../../contexts/useAccount'
 import { useNotifier } from '../../contexts/useNotifier'
 import { useNavigate } from 'react-router-dom'
 import * as Popover from '@radix-ui/react-popover'
+
 export default function MediaList({ albumId, albumName }) {
-    const { getAccessToken } = useAccount()
+    const { getAccessToken, user } = useAccount()
     const [open, setOpen] = useState(false)
     const [media, setMedia] = useState([])
     const [aspectRatios, setAspectRatios] = useState({})
@@ -58,7 +59,7 @@ export default function MediaList({ albumId, albumName }) {
         <div className="flex flex-col items-center justify-start w-full bg-[#141414]">
             <div className="flex flex-row items-center justify-between gap-2 w-full px-6 py-4">
                 <h1 className="text-xl font-bold text-white red-hat-display">Media</h1>
-                <Upload className="w-6 h-6 cursor-pointer" color="white" onClick={() => setOpen(true)} />
+                <Upload style={{ display: user?.IsAdmin ? 'block' : 'none' }} className="w-6 h-6 cursor-pointer" color="white" onClick={() => setOpen(true)} />
             </div>
             <MediaUploadModal
                 open={open}
@@ -104,7 +105,7 @@ export default function MediaList({ albumId, albumName }) {
                                         <button className="text-white px-1 py-1 rounded-md absolute top-2 right-2 cursor-pointer z-50" onClick={(e) => {
                                             e.stopPropagation()
                                         }}>
-                                            <EllipsisVertical className="w-4 h-4" />
+                                            <EllipsisVertical style={{ display: user?.IsAdmin ? 'block' : 'none' }} className="w-4 h-4" />
                                         </button>
                                     </Popover.Trigger>
                                     <Popover.Portal>

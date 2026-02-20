@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useNotifier } from '../../contexts/useNotifier'
 import AlbumEditModal from './AlbumEditModal'
 export default function AlbumList({ currentAlbumName }) {
-    const { getAccessToken } = useAccount()
+    const { getAccessToken, user } = useAccount()
     const [open, setOpen] = useState(false)
     const [openEdit, setOpenEdit] = useState(false)
     const [editingAlbum, setEditingAlbum] = useState(null)
@@ -55,7 +55,7 @@ export default function AlbumList({ currentAlbumName }) {
         <div className="flex flex-col items-center justify-start h-min w-full bg-[#141414]">
             <div className="flex flex-row items-center justify-between gap-2 w-full px-6 py-4">
                 <h1 className="text-xl font-bold text-white red-hat-display">Albums</h1>
-                <PlusIcon className="w-6 h-6 cursor-pointer" color="white" onClick={() => setOpen(true)} />
+                <PlusIcon style={{ display: user?.IsAdmin ? 'block' : 'none' }} className="w-6 h-6 cursor-pointer" color="white" onClick={() => setOpen(true)} />
             </div>
             <div className="flex flex-row items-center justify-start gap-2 w-full px-6 flex-wrap">
                 {albums.map((album) => (
@@ -76,7 +76,7 @@ export default function AlbumList({ currentAlbumName }) {
                         }}
                     >
                         <p className="text-white red-hat-text">{album.Title}</p>
-                        <EllipsisVertical className="w-6 h-6 cursor-pointer" color="white" onClick={(e) => {
+                        <EllipsisVertical style={{ display: user?.IsAdmin ? 'block' : 'none' }} className="w-6 h-6 cursor-pointer" color="white" onClick={(e) => {
                             e.stopPropagation()
                             setEditingAlbum(album)
                             setOpenEdit(true)

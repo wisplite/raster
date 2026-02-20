@@ -24,6 +24,7 @@ func Init() bool {
 		&models.AccessToken{},
 		&models.UserAlbumAccess{},
 		&models.Media{},
+		&models.Settings{},
 	)
 	if err != nil {
 		log.Fatal("failed to migrate database: ", err)
